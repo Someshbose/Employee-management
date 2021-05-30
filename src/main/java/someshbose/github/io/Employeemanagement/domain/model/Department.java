@@ -1,9 +1,8 @@
 package someshbose.github.io.Employeemanagement.domain.model;
 
 import java.util.Collection;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,5 +22,11 @@ public class Department {
 
   @OneToMany(mappedBy="department")
   private Collection<Employee> employees;
+
+  //chapter -2
+//  @ManyToMany
+//  @MapKey(name="empName")
+//  @Convert(converter=UpperCaseConverter.class, attributeName="key.lastName")
+//  private Map<EmployeeName, Employee> employees;
   
 }

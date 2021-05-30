@@ -38,17 +38,11 @@ import someshbose.github.io.Employeemanagement.domain.converter.BooleanToInteger
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Employee {
   @Id
-  //@Column(name = "EMP_ID")
   private long id;
-  private String name;
-  private long salary;
 
-  @Embedded
-  @AttributeOverrides({
-      @AttributeOverride(name="state", column=@Column(name="PROVINCE")),
-      @AttributeOverride(name="zip", column=@Column(name="POSTAL_CODE"))
-  })
-  private Address address;
+  private String name;
+
+  private long salary;
 
   @Enumerated(EnumType.STRING)
   private EmployeeType type;
@@ -63,19 +57,24 @@ public class Employee {
 
   @ManyToMany
   @JoinTable(name="EMP_PROJ",
-      joinColumns=@JoinColumn(name="employee_id"),
-      inverseJoinColumns=@JoinColumn(name="project_id"))
+      joinColumns=@JoinColumn(name="EMP_ID"),
+      inverseJoinColumns=@JoinColumn(name="PROJ_ID"))
   private Collection<Project> projects;
 
-//  @OneToMany(mappedBy = "employee")
-//  private Collection<EmployeeProject> projects;
-//
   @OneToMany
   @JoinTable(name="EMP_PHONE",
-      joinColumns=@JoinColumn(name="eomployee_id"),
-      inverseJoinColumns=@JoinColumn(name="phone_id"))
+      joinColumns=@JoinColumn(name="EMP_ID"),
+      inverseJoinColumns=@JoinColumn(name="PHONE_ID"))
   private Collection<Phone> phones;
 
+  @Embedded
+  @AttributeOverrides({
+          @AttributeOverride(name="state", column=@Column(name="PROVINCE")),
+          @AttributeOverride(name="zip", column=@Column(name="POSTAL_CODE"))
+  })
+  private Address address;
+
+  //chapter-2
   @Convert(converter = BooleanToIntegerConverter.class,attributeName = "bonded")
   private SecurityInfo securityInfo;
 

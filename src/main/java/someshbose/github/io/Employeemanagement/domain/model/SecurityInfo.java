@@ -4,5 +4,7 @@ import javax.persistence.Embeddable;
 
 @Embeddable
 public class SecurityInfo {
+
   private Boolean bonded;
+
 }

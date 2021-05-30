@@ -21,13 +21,10 @@ import lombok.Setter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Project {
   @Id
- // @Column(name = "PROJ_ID")
   private long id;
   private String name;
 
   @ManyToMany(mappedBy="projects")
   private Collection<Employee> employees;
-//  @OneToMany(mappedBy="project")
-//  private Collection<EmployeeProject> employees;
 
 }
