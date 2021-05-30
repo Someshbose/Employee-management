@@ -4,25 +4,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Generated;
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.ElementCollection;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,29 +19,49 @@ import someshbose.github.io.Employeemanagement.domain.converter.BooleanToInteger
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@IdClass(EmployeeId.class)
+@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name="EMP_TYPE")
 public class Employee {
-  @Id
-  private long id;
 
+  @Id
+  private String country;
+
+  @Id
+  @Column(name="EMP_ID")
+  private int id;
+
+  @Column(insertable=false, updatable=false)
   private String name;
 
+  @Column(insertable=false, updatable=false)
   private long salary;
 
   @Enumerated(EnumType.STRING)
   private EmployeeType type;
 
-  @ManyToOne
-  @JoinColumn(name="DEPT_ID")
+  @ManyToOne(optional=false)
+  @JoinColumn(name="DEPT_ID", insertable=false, updatable=false)
+ // @JoinTable(name = "EMP_DEPT")
   private Department department;
 
   @OneToOne(fetch= FetchType.LAZY)
   @JoinColumn(name="PSPACE_ID")
   private ParkingSpace parkingSpace;
 
+//  @ManyToMany
+//  @JoinTable(name="EMP_PROJ",
+//      joinColumns=@JoinColumn(name="EMP_ID"),
+//      inverseJoinColumns=@JoinColumn(name="PROJ_ID"))
+//  private Collection<Project> projects;
+
   @ManyToMany
-  @JoinTable(name="EMP_PROJ",
-      joinColumns=@JoinColumn(name="EMP_ID"),
-      inverseJoinColumns=@JoinColumn(name="PROJ_ID"))
+  @JoinTable(
+          name="EMP_PROJECT",
+          joinColumns={
+                  @JoinColumn(name="EMP_COUNTRY", referencedColumnName="COUNTRY"),
+                  @JoinColumn(name="EMP_ID", referencedColumnName="EMP_ID")},
+          inverseJoinColumns=@JoinColumn(name="PROJECT_ID"))
   private Collection<Project> projects;
 
   @OneToMany
@@ -81,5 +84,30 @@ public class Employee {
   @ElementCollection
   @Convert
   private List<Boolean> securityClearances;
+
+  @ManyToOne
+  @JoinColumns({
+          @JoinColumn(name="MGR_COUNTRY", referencedColumnName="COUNTRY"),
+          @JoinColumn(name="MGR_ID", referencedColumnName="EMP_ID")
+  })
+  private Employee manager;
+
+  @OneToMany(mappedBy="manager")
+  private Collection<Employee> directs;
+
+  @OneToMany(orphanRemoval=true)
+  private List<Evaluation> evals;
+
+  @OneToMany(mappedBy="employee")
+  private Collection<ProjectAssignment> assignments;
+
+  @Basic(fetch=FetchType.LAZY)
+  @Lob
+  @Column(table="EMP_LOB")
+  private byte[] photo;
+  @Basic(fetch=FetchType.LAZY)
+  @Lob
+  @Column(table="EMP_LOB")
+  private char[] comments;
 
 }
